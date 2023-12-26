@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+node_modules/
+.vscode/
+__pycache__/
+.idea/
+.txt
