@@ -36,3 +36,8 @@ node_modules/
 __pycache__/
 .idea/
 .txt
+.png
+.jpeg
+.gif
+.pdf
+.py
