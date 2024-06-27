@@ -57,7 +57,7 @@ void Planet::Write_to_file(std::string file_name, std::vector<std::vector<double
     file.open(file_name);
     
     for(int i = 0; i < x_3d.size(); i++)
-    {   //PROMIJENI OVO IZ STRUCT U VECTOR OPET NE ZNAN NI SAM STA SE DOGADA A JA SAN PISA KOD
+    {  
         file << x_3d.at(i) << std::setw(15) << y_3d.at(i) << std::setw(15) << z_3d.at(i) << "\n";
     }
 
