@@ -1,34 +1,78 @@
 #include <vector>
 #include <cmath>
 #include "planet.h"
+#include "rocket.h"
 
 
 class System
 {
     private:
-        double m_max_time, m_grav_const = 6.6743e-11, m_dt = 3600;
+        double m_max_time, m_grav_const = 6.6743e-11, m_dt = 0.1, m_remember_thrust_influence_x, m_remember_thrust_influence_y, m_remember_thrust_influence_z;
+        double m_remember_gravity_influence_after_turn_x, m_remember_gravity_influence_after_turn_y, m_remember_gravity_influence_after_turn_z;
+        double m_remember_gravity_turn_thrust_x, m_remember_gravity_turn_thrust_y, m_remember_gravity_turn_thrust_z;
+        double theta = M_PI/2;
+        double phi = 0;
+        double vx = 0;
+        double vy = 0;
+        double vz = 1;
         //std::vector<coords> vector_of_3D_coordinates;
-        double m_x_acceleration(double mass, Planet& object_1, Planet& object_2); 
-        double m_y_acceleration(double mass, Planet& object_1, Planet& object_2); 
+        double m_x_acceleration(double mass, Planet& object_1, Planet& object_2, Rocket& rocket, double current_time); 
+        double m_y_acceleration(double mass, Planet& object_1, Planet& object_2, Rocket& rocket, double current_time); 
+        double m_z_acceleration(double mass, Planet& object_1, Planet& object_2, Rocket& rocket, double current_time);
+        double m_rocket_x_acceleration(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_rocket_y_acceleration(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_rocket_z_acceleration(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_numerical_derivative(std::function<double(double)> function, double time);
+        double m_rocket_x_acceleration_engine_off(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_rocket_y_acceleration_engine_off(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_rocket_z_acceleration_engine_off(Planet& planet1, Planet& planet2, Rocket& rocket, double current_time);
+        double m_rocket_x_acceleration_tilted(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_y_acceleration_tilted(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_z_acceleration_tilted(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_x_acceleration_TLI(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_y_acceleration_TLI(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_z_acceleration_TLI(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_x_acceleration_lunar_capture(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_y_acceleration_lunar_capture(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_z_acceleration_lunar_capture(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_x_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_y_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_rocket_z_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
+        double m_orbital_velocity(double distance);
+        std::vector<double> m_cross_product(std::vector<double> v1, std::vector<double> v2);
+        //double phi(double old_phi, double angle);
+
+
 
     public:
         System(double max_time, std::vector<double> time);
-        void move(Planet& object_1, Planet& object_2);
+        void lift_off(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void tilting(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket);
+        void translunar_injection_burn(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lunar_capture(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lunar_orbit(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lunar_landing(Planet& object_1, Planet& object_2, Rocket& rocket);
         std::vector<double> _time;
         void WriteToFile(std::string filename, Planet object);
-        std::vector<std::vector<double>> Move_3d
-        (
+        void WriteToFile2(std::string filename, Rocket rocket);
+        void WriteToFile3(std::string filename, Rocket rocket);
+        std::vector<std::vector<double>> Move_3d(
             std::vector<std::vector<double>>& object_3d, 
             std::vector<double> object_cm_x, 
             std::vector<double> object_cm_y
         );
         std::vector<std::vector<double>> vector_of_evolved_3d_coords, temp;
-        void Write_evolved_3d_to_file
-        (
-        std::string filename,
-        std::vector<std::vector<double>> coords_3d,
-        int size, std::vector<double> z_3d
+        void Write_evolved_3d_to_file(
+            std::string filename,
+            std::vector<std::vector<double>> coords_3d,
+            int size, std::vector<double> z_3d
         );
-        
+        double angle(Rocket& rocket);
+        double angle2(double x1, double x2, double y1, double y2, double z1, double z2);
+        double angle3(double x1, double x2, double y1, double y2, double z1, double z2);
+        void WriteToFile4(std::string filename, Rocket rocket);
 };
 

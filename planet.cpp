@@ -9,8 +9,10 @@ Planet::Planet(
     double distance_from_earth,
     double x_cm_0,
     double y_cm_0,
+    double z_cm_0,
     double v_x_cm_0,
-    double v_y_cm_0
+    double v_y_cm_0,
+    double v_z_cm_0
 )
 {
     m_radius = radius;
@@ -18,8 +20,10 @@ Planet::Planet(
     _mass = mass;
     x_cm.push_back(x_cm_0);
     y_cm.push_back(y_cm_0);
+    z_cm.push_back(z_cm_0);
     v_x_cm.push_back(v_x_cm_0);
     v_y_cm.push_back(v_y_cm_0);
+    v_z_cm.push_back(v_z_cm_0);
 
 }
 
