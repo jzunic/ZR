@@ -4,7 +4,7 @@
 #include "rocket.h"
 
 
-class System
+class Systemtest
 {
     private:
         double m_max_time, m_grav_const = 6.6743e-11, m_dt = 0.1, m_remember_thrust_influence_x, m_remember_thrust_influence_y, m_remember_thrust_influence_z;
@@ -39,7 +39,6 @@ class System
         double m_rocket_y_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
         double m_rocket_z_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
         double m_orbital_velocity(double distance);
-        double m_ro(double altitude);
         double m_one_orbit(double a);
         std::vector<double> m_cross_product(std::vector<double> v1, std::vector<double> v2);
         //double phi(double old_phi, double angle);
@@ -47,11 +46,11 @@ class System
 
 
     public:
-        System(double max_time, std::vector<double> time);
+        Systemtest(double max_time, std::vector<double> time);
         void lift_off(Planet& object_1, Planet& object_2, Rocket& rocket);
-        void tilting(Planet& object_1, Planet& object_2, Rocket& rocket, double calculated_angle);
-        void gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket, double calculated_angle);
-        void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket);
+        void tilting(Planet& object_1, Planet& object_2, Rocket& rocket, double trial_angle);
+        void gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket, double orbit);
         void translunar_injection_burn(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_capture(Planet& object_1, Planet& object_2, Rocket& rocket);
@@ -72,9 +71,14 @@ class System
             std::vector<std::vector<double>> coords_3d,
             int size, std::vector<double> z_3d
         );
-        double angle(Rocket& rocket);
+        double angle(Rocket rocket);
         double angle2(double x1, double x2, double y1, double y2, double z1, double z2);
         double angle3(double x1, double x2, double y1, double y2, double z1, double z2);
         void WriteToFile4(std::string filename, Rocket rocket);
+        double a_x_cm_1 = 0, a_y_cm_1 = 0, a_z_cm_1 = 0;
+        double a_x_cm_2 = 0, a_y_cm_2 = 0, a_z_cm_2 = 0;
+        double a_x_cm = 0, a_y_cm = 0, a_z_cm = 0;
+        double tilt_angle, angle_final;
+        double a_x_0, a_y_0, a_z_0;
 };
 

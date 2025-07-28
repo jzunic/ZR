@@ -16,6 +16,18 @@ System::System(double max_time, std::vector<double> time)
     _time.push_back(0);
 }
 
+double System::m_ro(double altitude)
+{
+    return 1225*exp(-(altitude - 6370e3)/8500);
+}
+
+double System::m_one_orbit(double a)
+{
+    double mu = 3.986e14;
+    double period = 2*M_PI*sqrt(pow(a, 3)/mu);
+    return period;
+}
+
 /*funkcija koja računa numeričke derivacije*/
 double System::m_numerical_derivative(std::function<double(double)> function, double time)
 {
@@ -73,11 +85,12 @@ double System::m_rocket_x_acceleration(Planet& planet1, Planet& planet2, Rocket&
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._x.back() - planet1.x_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._x.back() - planet2.x_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
     //std::cout <<"x: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
-    // if (rocket._x.back() < 6371e3 + 100e3) // zemljin radijus + gornja granica atmosfere
-    // {
-    //     drag_influence = -rocket._v_x.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
-    // }
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_x.back()*(1/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     if (rocket._mass_function(current_time) > 100e3)
     {
         //std::cout << m_numerical_derivative(rocket._mass_function, _time.back()) << ", " << rocket._mass_function(_time.back()) << std::endl;
@@ -85,6 +98,7 @@ double System::m_rocket_x_acceleration(Planet& planet1, Planet& planet2, Rocket&
     }
     //m_remember_thrust_influence_x = thrust_influence;
     //std::cout << "x: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << ", " << rocket._mass_function(current_time) << std::endl;
+    //std::cout << "x: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << ", " << grav_influence_planet1_on_rocket << ", " << drag_influence << std::endl;
     return (drag_influence + thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket);
 }
 
@@ -95,12 +109,12 @@ double System::m_rocket_y_acceleration(Planet& planet1, Planet& planet2, Rocket&
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._y.back() - planet1.y_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._y.back() - planet2.y_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
     //std::cout<<"y: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
-    // if (rocket._y.back() < 6371e3 + 100e3) // zemljin radijus + gornja granica atmosfere
-    // {
-    //     drag_influence = -rocket._v_y.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
-    // }
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_y.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     if (rocket._mass_function(current_time) > 100e3 /*&& distance_from_earth_center - 6371e3 < 100e3*/)
     {
         thrust_influence = thrust*sin(phi)*sin(theta);
@@ -113,6 +127,7 @@ double System::m_rocket_y_acceleration(Planet& planet1, Planet& planet2, Rocket&
     //     thrust_influence = 20000*m_numerical_derivative(rocket._mass_function, _time.back())/rocket._mass_function(_time.back());
     // }
     //std::cout << "y: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << ", " << rocket._mass_function(current_time) << std::endl;
+    //std::cout << "y: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return (drag_influence + thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket);
 }
 
@@ -123,11 +138,12 @@ double System::m_rocket_z_acceleration(Planet& planet1, Planet& planet2, Rocket&
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._z.back() - planet1.z_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._z.back() - planet2.z_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
     //std::cout<<"z: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
-    // if (rocket._z.back() < 6371e3 + 100e3) // zemljin radijus + gornja granica atmosfere
-    // {
-    //     drag_influence = -rocket._v_z.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
-    // }
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_z.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     //std::cout << drag_influence << ", ";
     if (rocket._mass_function(current_time) > 100e3) // ako ima goriva i ako je udaljenost od centra ta i ta
     {
@@ -143,6 +159,7 @@ double System::m_rocket_z_acceleration(Planet& planet1, Planet& planet2, Rocket&
     //std::cout << thrust_influence << std::endl;
     //std::cout<<"pogon: "<<thrust_influence<< "\n" << "otpor zraka: " << drag_influence << "\n" << "grav1: " << grav_influence_planet1_on_rocket << "\n" << "grav2: " << grav_influence_planet2_on_rocket << "\n" << "---" << std::endl;
     //std::cout << "z: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << ", " << rocket._mass_function(current_time) << std::endl;
+    //std::cout << "z: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return (drag_influence + thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket);
 }
 
@@ -251,12 +268,18 @@ double System::m_rocket_x_acceleration_tilted(Planet planet1, Planet planet2, Ro
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._x.back() - planet1.x_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._x.back() - planet2.x_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_x.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     if(rocket._mass_function(current_time) > 100e3)
     {
         thrust_influence = thrust_x*cos(tilt_angle) + (vy*thrust_z - vz*thrust_y)*sin(tilt_angle) + vx*(vx*thrust_x+vy*thrust_y+vz*thrust_z)*(1-cos(tilt_angle));
     }
     //std::cout <<"x: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << ", " << tilt_angle << ", "<< thrust << std::endl;
     //m_remember_gravity_turn_thrust_x = thrust_influence;
+    //std::cout << "x: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return(thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket + drag_influence);
 
 }
@@ -271,12 +294,18 @@ double System::m_rocket_y_acceleration_tilted(Planet planet1, Planet planet2, Ro
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._y.back() - planet1.y_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._y.back() - planet2.y_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_y.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     if(rocket._mass_function(current_time) > 100e3)
     {
         thrust_influence = thrust_y*cos(tilt_angle) + (vz*thrust_x - vx*thrust_z)*sin(tilt_angle) + vy*(vx*thrust_x+vy*thrust_y+vz*thrust_z)*(1-cos(tilt_angle));
     }
     //m_remember_gravity_turn_thrust_y = thrust_influence;
     //std::cout <<"y: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << std::endl;
+    //std::cout << "y: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return(thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket + drag_influence);
 
 }
@@ -291,12 +320,18 @@ double System::m_rocket_z_acceleration_tilted(Planet planet1, Planet planet2, Ro
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._z.back() - planet1.z_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._z.back() - planet2.z_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
+    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
+    {
+        drag_influence = -0.5*m_ro(distance_from_earth)*1*rocket._v_z.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
+    }
     if(rocket._mass_function(current_time) > 100e3)
     {
         thrust_influence = thrust_z*cos(tilt_angle) + (vx*thrust_y-vy*thrust_x)*sin(tilt_angle) + vz*(vx*thrust_x+vy*thrust_y+vz*thrust_z)*(1-cos(tilt_angle));
     }
     //m_remember_gravity_turn_thrust_z = thrust_influence;
     //std::cout <<"z: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << std::endl;
+    //std::cout << "z: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return(thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket + drag_influence);
 
 }
@@ -542,14 +577,19 @@ void System::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
         rocket._a_y.push_back(m_rocket_y_acceleration(object_1, object_2, rocket, _time.back()));
         rocket._a_z.push_back(m_rocket_z_acceleration(object_1, object_2, rocket, _time.back()));
 
+        //std::cout << rocket._v_x.back() << "+" << rocket._a_x.back() << "*" << m_dt << std::endl;
         rocket._v_x.push_back(rocket._v_x.back() + rocket._a_x.back()*m_dt);
         rocket._v_y.push_back(rocket._v_y.back() + rocket._a_y.back()*m_dt);
         rocket._v_z.push_back(rocket._v_z.back() + rocket._a_z.back()*m_dt);
+
+        //std::cout << rocket._v_x.back() << ", " << rocket._v_y.back() << ", " << rocket._v_z.back() << std::endl;
 
         rocket._x.push_back(rocket._x.back() + rocket._v_x.back()*m_dt);
         rocket._y.push_back(rocket._y.back() + rocket._v_y.back()*m_dt);
         rocket._z.push_back(rocket._z.back() + rocket._v_z.back()*m_dt);
 
+        // std::cout << "r: " << rocket._x.back() << ", " << rocket._y.back() << ", " << rocket._z.back() << std::endl;
+        // std::cout << _time.back() << std::endl;
         // vector_of_3D_coordinates.push_back(object_1.Generate_planet_3D(object_1));
         // vector_of_3D_coordinates.push_back(object_2.Generate_planet_3D(object_2));
         
@@ -557,11 +597,11 @@ void System::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
 
         double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
         //std::cout << distance_from_earth_center - 6371e3 << ", " << rocket._mass_function(_time.back()) << std::endl;
-        if (distance_from_earth_center - 6371e3 >= 1e3 || distance_from_earth_center - 6370e3 <= 0)
+        if (distance_from_earth_center - 6371e3 >= 500 || distance_from_earth_center - 6370e3 <= 0)
         {
             //std::cout << angle(rocket) << std::endl;
             std::cout << "Lift off ends: " <<_time.back() << std::endl;
-            std::cout << distance_from_earth_center - 6370e3 << std::endl;
+            std::cout << distance_from_earth_center - 6371e3 << std::endl;
             break;
         }
     }
@@ -576,7 +616,7 @@ void System::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
  * Funkcija staje kada se postigne željeni kut ili neki kut njemu blizak, ovisno o koraku
  * koji se koristi za promjenu kuta
  */
-void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket)
+void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket, double calculated_angle)
 {
 
     double acceleration_before_turn_x = rocket._a_x.back();
@@ -587,7 +627,7 @@ void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket)
     double acceleration_during_turn_x = 0, acceleration_during_turn_y = 0, acceleration_during_turn_z = 0;
 
     double tilt_angle;
-    double counter = 1;
+    int counter = 1;
 
 
     //std::cout << velocity_before_turn_x << ", " << velocity_before_turn_y << ", " << velocity_before_turn_z << std::endl;
@@ -596,8 +636,8 @@ void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket)
     {
 
         tilt_angle = angle2(acceleration_before_turn_x, acceleration_during_turn_x, acceleration_before_turn_y, acceleration_during_turn_y, acceleration_before_turn_z, acceleration_during_turn_z);
-        //std::cout << "kut izmedu prvotne radijalne akceleracije i nove rotirane: " << tilt_angle << "\n"<< std::endl;
-        if(tilt_angle <= 55 || tilt_angle == 0) // ako je kut otklona manji od 10 stupnjeva, koristim matricu rotacije oko z osi za rotirati vektor akceleracije za kut 0.1, counter je tu samo osiguranje da se ne izvrsi if blok previse puta 
+        //std::cout << "kut: " << tilt_angle << std::endl;
+        if(tilt_angle <= calculated_angle || tilt_angle == 0) // ako je kut otklona manji od 10 stupnjeva, koristim matricu rotacije oko z osi za rotirati vektor akceleracije za kut 0.1, counter je tu samo osiguranje da se ne izvrsi if blok previse puta 
         {
             object_1.a_x_cm.push_back(m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
             object_1.a_y_cm.push_back(m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
@@ -648,9 +688,10 @@ void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket)
         {
             double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
             //std::cout << m_remember_thrust_influence_after_turn_x;
-            std::cout << distance_from_earth_center - 6370e3 << std::endl;
-            std::cout << "Tilting process ends: " <<_time.back() << std::endl;
-            std::cout << tilt_angle << std::endl;
+            // std::cout << "fuel: " <<rocket._mass_function(_time.back()) << std::endl;
+            // std::cout << distance_from_earth_center - 6370e3 << std::endl;
+            // std::cout << "Tilting process ends: " <<_time.back() << std::endl;
+            // std::cout << tilt_angle << std::endl;
             break;
         }
     }
@@ -661,11 +702,11 @@ void System::tilting(Planet& object_1, Planet& object_2, Rocket& rocket)
  * Svakim korakom vektor pogona rakete se namješta da bude u istom smjeru kao akceleracija 
  * iz prethodnog koraka
  */
-void System::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket)
+void System::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket, double calculated_angle)
 {
     double counter = 0;
 
-    double tilt_angle = angle3(rocket._a_x.at(0), rocket._a_x.back(), rocket._a_y.at(0), rocket._a_y.back(), rocket._a_z.at(0), rocket._a_z.back());
+    double tilt_angle = object_1.degree_to_radians(calculated_angle);
     double angle = angle2(rocket._x.back(), rocket._v_x.back(), rocket._y.back(), rocket._v_y.back(), rocket._z.back(), rocket._v_z.back());
     
     
@@ -720,11 +761,12 @@ void System::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket)
         double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
         double velocity = sqrt(pow(rocket._v_x.back(),2) + pow(rocket._v_y.back(),2) + pow(rocket._v_z.back(),2));
         /*orbitalna brzina i kut*/
-        if(rocket._mass_function(_time.back()) <= 100e3 || (angle >= 90 && velocity >=7.9e3))
+        if(rocket._mass_function(_time.back()) <= 100e3 || (angle >= 90 && velocity >=7.82e3))
         {
-            std::cout << rocket._mass_function(_time.back()) << std::endl;
+            std::cout << "fuel: " <<rocket._mass_function(_time.back()) << std::endl;
             std::cout << "angle: "<< angle << std::endl;
-            std::cout << distance_from_earth_center - 6370e3 << std::endl;
+            std::cout << "distance: " << distance_from_earth_center - 6370e3 << std::endl;
+            std::cout << "velocity: " << velocity << std::endl;
             std::cout << "gravity turn ends: " <<_time.back() << std::endl;
             break;
         }
@@ -734,6 +776,11 @@ void System::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket)
 
 void System::orbit(Planet& object_1, Planet& object_2, Rocket& rocket)
 {
+
+    double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double time_for_one_orbit = m_one_orbit(6.67339e+06);
+    double t0 = _time.back();
+
     while(_time.back() <= m_max_time)
     {
         object_1.a_x_cm.push_back(m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
@@ -774,10 +821,9 @@ void System::orbit(Planet& object_1, Planet& object_2, Rocket& rocket)
         rocket._z.push_back(rocket._z.back() + rocket._v_z.back()*m_dt);
 
         _time.push_back(_time.back() + m_dt);
-        double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
-        double angle_between_rocket_and_moon = angle3(rocket._x.back(), object_1.x_cm.back(), rocket._y.back(), object_1.y_cm.back(), rocket._z.back(), object_1.z_cm.back());
-        /*trenutak izbacivanja rakete iz Zemljine orbite znatno utječe na putanju*/
-        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= 147.63*60))
+        distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+
+        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= time_for_one_orbit + t0))
         {
             m_dt = 1;
             //std::cout << distance_from_earth_center-6370e3 << std::endl;
@@ -1201,7 +1247,8 @@ void System::WriteToFile3(std::string filename, Rocket rocket)
 
     for(int i = 0; i < rocket._v_x.size(); i++)
     {
-        file << rocket._v_x.at(i) << std::setw(15) << rocket._v_y.at(i) << std::setw(15) << rocket._v_z.at(i) << std::endl;
+        double velocity = sqrt(pow(rocket._v_x.at(i),2) + pow(rocket._v_y.at(i),2) + pow(rocket._v_z.at(i),2));
+        file << _time.at(i) << std::setw(15) << rocket._v_x.at(i) << std::setw(15) << rocket._v_y.at(i) << std::setw(15) << rocket._v_z.at(i) << std::setw(15) << velocity << std::endl;
     }
 
     file.close();
@@ -1215,7 +1262,8 @@ void System::WriteToFile4(std::string filename, Rocket rocket)
 
     for(int i = 0; i < rocket._a_x.size(); i++)
     {
-        file << std::fixed << std::setprecision(7) <<rocket._a_x.at(i) << std::setw(15) << std::fixed << std::setprecision(7) << rocket._a_y.at(i) << std::setw(15) << std::fixed << std::setprecision(7) << rocket._a_z.at(i) << std::endl;
+        double acceleration = sqrt(pow(rocket._a_x.at(i),2) + pow(rocket._a_y.at(i),2) + pow(rocket._a_z.at(i),2));
+        file << std::fixed << std::setprecision(7) << _time.at(i) << std::setw(15) << std::fixed << std::setprecision(7) <<rocket._a_x.at(i) << std::setw(15) << std::fixed << std::setprecision(7) << rocket._a_y.at(i) << std::setw(15) << std::fixed << std::setprecision(7) << rocket._a_z.at(i) << std::setw(15) << acceleration <<std::endl;
     }
 
     file.close();
