@@ -2,6 +2,9 @@
 #include <cmath>
 #include "planet.h"
 #include "rocket.h"
+#include <fstream>
+#include <iomanip>
+#include <string>
 
 
 class Systemtest
@@ -38,19 +41,22 @@ class Systemtest
         double m_rocket_x_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
         double m_rocket_y_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
         double m_rocket_z_acceleration_lunar_landing(Planet planet1, Planet planet2, Rocket rocket, double current_time, double tilt_angle);
-        double m_orbital_velocity(double distance);
+        double m_orbital_velocity(double distance, double mass, double radius);
         double m_one_orbit(double a);
+        void move_planets(Planet& object_1, Planet& object_2, Rocket& rocket, double current_time);
+        void move_rocket(Rocket& rocket, double accelerationx, double accelerationy, double accelerationz);
         std::vector<double> m_cross_product(std::vector<double> v1, std::vector<double> v2);
+        std::ofstream tempfile;
         //double phi(double old_phi, double angle);
 
 
 
     public:
         Systemtest(double max_time, std::vector<double> time);
-        void lift_off(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lift_off(Planet& object_1, Planet& object_2, Rocket& rocket, int altitude);
         void tilting(Planet& object_1, Planet& object_2, Rocket& rocket, double trial_angle);
         void gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket);
-        void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket, double orbit);
+        void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket, double orbit_fraction);
         void translunar_injection_burn(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_capture(Planet& object_1, Planet& object_2, Rocket& rocket);
@@ -80,5 +86,7 @@ class Systemtest
         double a_x_cm = 0, a_y_cm = 0, a_z_cm = 0;
         double tilt_angle, angle_final;
         double a_x_0, a_y_0, a_z_0;
+        double time_for_one_orbit;
+        bool success;
 };
 

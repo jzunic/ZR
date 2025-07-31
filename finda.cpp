@@ -22,5 +22,6 @@ int main()
             max = std::stod(value);
     }
 
-    std::cout << "apogee: " << max << ", perigee: " << min << "a: " <<  (min+max)/2 << std::endl; 
+    std::cout << "apogee: " << max << ", perigee: " << min << ", a: " <<  (min+max)/2 << std::endl;
+    std::cout << "apogee: " << max - 6371e3 << ", perigee: " << min - 6371e3 << std::endl; 
 }

@@ -35,10 +35,20 @@ double Systemtest::m_numerical_derivative(std::function<double(double)> function
     return derviative;
 }
 
-double Systemtest::m_orbital_velocity(double distance)
+double Systemtest::m_orbital_velocity(double distance, double mass, double radius)
 {
-    double orbital_velocity = sqrt(m_grav_const*7.35e22/(1737e3 + distance));
+    double orbital_velocity = sqrt(m_grav_const*mass/(radius + distance));
     return orbital_velocity;
+}
+
+double sgn(double x)
+{
+    if(x > 0)
+        return 1;
+    else if (x == 0)
+        return 0;
+    else
+        return -1;
 }
 
 /*funkcija koja računa x komponentnu akceleracije planeta*/
@@ -85,7 +95,7 @@ double Systemtest::m_rocket_x_acceleration(Planet& planet1, Planet& planet2, Roc
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._x.back() - planet1.x_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._x.back() - planet2.x_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     //std::cout <<"x: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
@@ -109,7 +119,7 @@ double Systemtest::m_rocket_y_acceleration(Planet& planet1, Planet& planet2, Roc
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._y.back() - planet1.y_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._y.back() - planet2.y_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     //std::cout<<"y: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
@@ -138,7 +148,7 @@ double Systemtest::m_rocket_z_acceleration(Planet& planet1, Planet& planet2, Roc
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._z.back() - planet1.z_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._z.back() - planet2.z_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     //std::cout<<"z: " << grav_influence_planet1_on_rocket << ", " << grav_influence_planet2_on_rocket << std::endl;
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
@@ -173,7 +183,7 @@ double Systemtest::m_rocket_x_acceleration_engine_off(Planet& planet1, Planet& p
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._x.back() - planet1.x_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._x.back() - planet2.x_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    //std::cout << "x: " << thrust_influence << ", " << grav_influence_planet1_on_rocket << std::endl;
+    //std::cout << "x: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return (drag_influence + thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket);
 }
 
@@ -183,7 +193,7 @@ double Systemtest::m_rocket_y_acceleration_engine_off(Planet& planet1, Planet& p
     double thrust_influence = 0;
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._y.back() - planet1.y_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._y.back() - planet2.y_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    //std::cout << "y: " << thrust_influence << ", " << grav_influence_planet1_on_rocket << std::endl;
+    //std::cout << "y: " << thrust_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return (drag_influence + thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket);
 }
 
@@ -250,6 +260,44 @@ double Systemtest::angle3(double x1, double x2, double y1, double y2, double z1,
     return (angle_in_radians);
 }
 
+void Systemtest::move_planets(Planet& object_1, Planet& object_2, Rocket& rocket, double current_time)
+{
+    a_x_cm_1 = (m_x_acceleration(object_2._mass, object_1, object_2, rocket, current_time));
+    a_y_cm_1 = (m_y_acceleration(object_2._mass, object_1, object_2, rocket, current_time));
+    a_z_cm_1 = (m_z_acceleration(object_2._mass, object_1, object_2, rocket, current_time));
+
+    object_1.v_x_cm.back() = (object_1.v_x_cm.back() + a_x_cm_1*m_dt);
+    object_1.v_y_cm.back() = (object_1.v_y_cm.back() + a_y_cm_1*m_dt);
+    object_1.v_z_cm.back() = (object_1.v_z_cm.back() + a_z_cm_1*m_dt);
+
+    object_1.x_cm.back() = (object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
+    object_1.y_cm.back() = (object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
+    object_1.z_cm.back() = (object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);     
+    
+    a_x_cm_2 = (m_x_acceleration(object_1._mass, object_2, object_1, rocket, current_time));
+    a_y_cm_2 = (m_y_acceleration(object_1._mass, object_2, object_1, rocket, current_time));
+    a_z_cm_2 = (m_z_acceleration(object_1._mass, object_2, object_1, rocket, current_time));
+
+    object_2.v_x_cm.back() = (object_2.v_x_cm.back() + a_x_cm_2*m_dt);
+    object_2.v_y_cm.back() = (object_2.v_y_cm.back() + a_y_cm_2*m_dt);
+    object_2.v_z_cm.back() = (object_2.v_z_cm.back() + a_z_cm_2*m_dt);
+
+    object_2.x_cm.back() = (object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
+    object_2.y_cm.back() = (object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
+    object_2.z_cm.back() = (object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
+}
+
+void Systemtest::move_rocket(Rocket& rocket, double accelerationx, double accelerationy, double accelerationz)
+{
+    rocket._v_x.back() = (rocket._v_x.back() + accelerationx*m_dt);
+    rocket._v_y.back() = (rocket._v_y.back() + accelerationy*m_dt);
+    rocket._v_z.back() = (rocket._v_z.back() + accelerationz*m_dt);
+
+    rocket._x.back() = (rocket._x.back() + rocket._v_x.back()*m_dt);
+    rocket._y.back() = (rocket._y.back() + rocket._v_y.back()*m_dt);
+    rocket._z.back() = (rocket._z.back() + rocket._v_z.back()*m_dt);
+}
+
 /**
  * Računa x komponentnu akceleracije, ali rotirane oko određene osi za određeni kut
  * Prvo se računa akceleracija koju bi raketa imala u slučaju da nema rotacije
@@ -268,7 +316,7 @@ double Systemtest::m_rocket_x_acceleration_tilted(Planet planet1, Planet planet2
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._x.back() - planet1.x_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._x.back() - planet2.x_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
         drag_influence = -0.5*ro(distance_from_earth)*1*rocket._v_x.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
@@ -277,7 +325,7 @@ double Systemtest::m_rocket_x_acceleration_tilted(Planet planet1, Planet planet2
     {
         thrust_influence = thrust_x*cos(tilt_angle) + (vy*thrust_z - vz*thrust_y)*sin(tilt_angle) + vx*(vx*thrust_x+vy*thrust_y+vz*thrust_z)*(1-cos(tilt_angle));
     }
-    //std::cout <<"x: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << ", " << tilt_angle << ", "<< thrust << std::endl;
+    //std::cout <<"x: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << ", " << tilt_angle <<std::endl;
     //m_remember_gravity_turn_thrust_x = thrust_influence;
     //std::cout << "x: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return(thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket + drag_influence);
@@ -294,7 +342,7 @@ double Systemtest::m_rocket_y_acceleration_tilted(Planet planet1, Planet planet2
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._y.back() - planet1.y_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._y.back() - planet2.y_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
         drag_influence = -0.5*ro(distance_from_earth)*1*rocket._v_y.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
@@ -304,7 +352,7 @@ double Systemtest::m_rocket_y_acceleration_tilted(Planet planet1, Planet planet2
         thrust_influence = thrust_y*cos(tilt_angle) + (vz*thrust_x - vx*thrust_z)*sin(tilt_angle) + vy*(vx*thrust_x+vy*thrust_y+vz*thrust_z)*(1-cos(tilt_angle));
     }
     //m_remember_gravity_turn_thrust_y = thrust_influence;
-    //std::cout <<"y: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << std::endl;
+    //std::cout <<"y: " <<thrust_influence << ", " <<  grav_influence_planet2_on_rocket << ", " << rocket._mass_function(current_time) <<std::endl;
     //std::cout << "y: " << thrust_influence << ", " << drag_influence << ", " << grav_influence_planet2_on_rocket << std::endl;
     return(thrust_influence + grav_influence_planet1_on_rocket + grav_influence_planet2_on_rocket + drag_influence);
 
@@ -320,7 +368,7 @@ double Systemtest::m_rocket_z_acceleration_tilted(Planet planet1, Planet planet2
     double thrust_z = thrust*cos(theta);
     double grav_influence_planet1_on_rocket = -m_grav_const*planet1._mass*(rocket._z.back() - planet1.z_cm.back())/pow(sqrt(pow(planet1.x_cm.back() - rocket._x.back(), 2) + pow(planet1.y_cm.back() - rocket._y.back(), 2) + pow(planet1.z_cm.back() - rocket._z.back(), 2)), 3);
     double grav_influence_planet2_on_rocket = -m_grav_const*planet2._mass*(rocket._z.back() - planet2.z_cm.back())/pow(sqrt(pow(planet2.x_cm.back() - rocket._x.back(), 2) + pow(planet2.y_cm.back() - rocket._y.back(), 2) + pow(planet2.z_cm.back() - rocket._z.back(), 2)), 3);
-    double distance_from_earth = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
+    double distance_from_earth = sqrt(pow(rocket._x.back() - planet2.x_cm.back(),2) + pow(rocket._y.back() - planet2.y_cm.back(),2) + pow(rocket._z.back() - planet2.z_cm.back(),2));
     if (distance_from_earth - 6371e3 < 100e3) // zemljin radijus + gornja granica atmosfere
     {
         drag_influence = -0.5*ro(distance_from_earth)*1*rocket._v_z.back()*(0.47/(rocket._mass_function(current_time)))*sqrt(pow(rocket._v_x.back(), 2) + pow(rocket._v_y.back(), 2) + pow(rocket._v_z.back(), 2)); //0.47 je koef trenja za kuglu, lako mijenjat kasnije
@@ -414,8 +462,10 @@ std::vector<double> Systemtest::m_cross_product(std::vector<double> v1, std::vec
  * Funkcija se zaustavlja kada se postignu željeni uvjeti za početak gravity turna.
  * Ne mogu shvatiti koji su to uvjeti
  */
-void Systemtest::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
+void Systemtest::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket, int altitude)
 {       
+
+    tempfile.open("yaaa.txt", std::ios::out | std::ios::app);
     while (_time.back() < m_max_time)
     {    
         a_x_cm_1 = m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back());
@@ -471,12 +521,15 @@ void Systemtest::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
         a_y_0 = a_y_cm;
         a_z_0 = a_z_cm;
 
-        double distance_from_earth_center = sqrt(pow(rocket._x.at(0),2) + pow(rocket._y.at(0),2) + pow(rocket._z.at(0),2));
+        tempfile << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
+
+        double distance_from_earth_center = sqrt(pow(rocket._x.back() - object_2.x_cm.back(),2) + pow(rocket._y.back() - object_2.y_cm.back(),2) + pow(rocket._z.back() - object_2.z_cm.back(),2));
         //std::cout << distance_from_earth_center - 6371e3 << std::endl;
-        if ((distance_from_earth_center - 6371e3 >= 500) || distance_from_earth_center - 6370e3 <= 0)
+        if ((distance_from_earth_center - 6371e3 >= altitude) || distance_from_earth_center - 6370e3 <= 0)
         {
             //std::cout << angle(rocket) << std::endl;
-            std::cout << "Lift off ends: " <<_time.back() << std::endl;
+            //std::cout << "Lift off ends: " <<_time.back() << std::endl;
+            std::cout << "altitude: " << altitude << std::endl;
             //std::cout << distance_from_earth_center - 6371e3 << std::endl;
             break;
         }
@@ -561,7 +614,7 @@ void Systemtest::tilting(Planet& object_1, Planet& object_2, Rocket& rocket, dou
             _time.push_back(_time.back() + m_dt);
             counter++;
             
-
+            tempfile << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
         }
         else
         {
@@ -590,30 +643,8 @@ void Systemtest::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket
     
     while(_time.back() < m_max_time)
     {
-        a_x_cm_1 = (m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-        a_y_cm_1 = (m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-        a_z_cm_1 = (m_z_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-
-        object_1.v_x_cm.back() = (object_1.v_x_cm.back() + a_x_cm_1*m_dt);
-        object_1.v_y_cm.back() = (object_1.v_y_cm.back() + a_y_cm_1*m_dt);
-        object_1.v_z_cm.back() = (object_1.v_z_cm.back() + a_z_cm_1*m_dt);
-
-        object_1.x_cm.back() = (object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
-        object_1.y_cm.back() = (object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
-        object_1.z_cm.back() = (object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);     
         
-        a_x_cm_2 = (m_x_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-        a_y_cm_2 = (m_y_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-        a_z_cm_2 = (m_z_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-
-        object_2.v_x_cm.back() = (object_2.v_x_cm.back() + a_x_cm_2*m_dt);
-        object_2.v_y_cm.back() = (object_2.v_y_cm.back() + a_y_cm_2*m_dt);
-        object_2.v_z_cm.back() = (object_2.v_z_cm.back() + a_z_cm_2*m_dt);
-
-        object_2.x_cm.back() = (object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
-        object_2.y_cm.back() = (object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
-        object_2.z_cm.back() = (object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
-
+        move_planets(object_1, object_2, rocket, _time.back());
         
         a_x_cm = (m_rocket_x_acceleration_tilted(object_1, object_2, rocket, _time.back(), tilt_angle)); 
         a_y_cm = (m_rocket_y_acceleration_tilted(object_1, object_2, rocket, _time.back(), tilt_angle));
@@ -622,25 +653,21 @@ void Systemtest::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket
 
         //std::cout << velocity_after_turn_x << ", " << velocity_after_turn_y << ", " << velocity_after_turn_z << std::endl;
         
-        rocket._v_x.back() = (rocket._v_x.back() + a_x_cm*m_dt);
-        rocket._v_y.back() = (rocket._v_y.back() + a_y_cm*m_dt);
-        rocket._v_z.back() = (rocket._v_z.back() + a_z_cm*m_dt);
-
-        rocket._x.back() = (rocket._x.back() + rocket._v_x.back()*m_dt);
-        rocket._y.back() = (rocket._y.back() + rocket._v_y.back()*m_dt);
-        rocket._z.back() = (rocket._z.back() + rocket._v_z.back()*m_dt); 
+        move_rocket(rocket, a_x_cm, a_y_cm, a_z_cm);
 
         _time.push_back(_time.back() + m_dt);
         tilt_angle = angle3(a_x_0, rocket._v_x.back(), a_y_0, rocket._v_y.back(), a_z_0, rocket._v_z.back());
         angle_final = angle2(rocket._x.back(), rocket._v_x.back(), rocket._y.back(), rocket._v_y.back(), rocket._z.back(), rocket._v_z.back());
         counter++;
+
+        tempfile << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
         
         //double acceleration_value = sqrt(pow(rocket._a_x.back(), 2) + pow(rocket._a_y.back(), 2) + pow(rocket._a_z.back(), 2));
-        double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
-        double velocity = sqrt(pow(rocket._v_x.back(),2) + pow(rocket._v_y.back(),2) + pow(rocket._v_z.back(),2));
+        double distance_from_earth_center = sqrt(pow(rocket._x.back() - object_2.x_cm.back(),2) + pow(rocket._y.back() - object_2.y_cm.back(),2) + pow(rocket._z.back() - object_2.z_cm.back(),2));
+        double velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
         /*orbitalna brzina i kut*/
         //std::cout << "bla angle final: " << angle_final << std::endl;
-        if(rocket._mass_function(_time.back()) <= 100e3 || (angle_final >= 90 && velocity >=7.82e3 && (distance_from_earth_center-6371e3 > 150e3 /*&& distance_from_earth_center-6371e3 < 150e3*/)))
+        if(rocket._mass_function(_time.back()) <= 100e3 || ((angle_final >= 90 && angle_final < 90.2) && velocity >=7.82e3 && (distance_from_earth_center-6371e3 > 150e3 /*&& distance_from_earth_center-6371e3 < 150e3*/)))
         {
             std::cout << "fuel: " << rocket._mass_function(_time.back()) << std::endl;
             std::cout << "angle: "<< angle_final << std::endl;
@@ -654,62 +681,63 @@ void Systemtest::gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket
     
 }
 
-void Systemtest::orbit(Planet& object_1, Planet& object_2, Rocket& rocket, double t)
+void Systemtest::orbit(Planet& object_1, Planet& object_2, Rocket& rocket, double orbit_fraction)
 {
     std::ofstream file;
     file.open("udaljenosti.txt");
 
-    double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
-    double velocity = sqrt(pow(rocket._v_x.back(),2) + pow(rocket._v_y.back(),2) + pow(rocket._v_z.back(),2));
-    double time_for_one_orbit = m_one_orbit(6.67339e+06);
+    double distance_from_earth_center = sqrt(pow(rocket._x.back() - object_2.x_cm.back(),2) + pow(rocket._y.back() - object_2.y_cm.back(),2) + pow(rocket._z.back() - object_2.z_cm.back(),2));
+    double velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
     double t0 = _time.back();
+    time_for_one_orbit = m_one_orbit(6.53103e+06);
+    double angle = angle2(rocket._x.back(), rocket._v_x.back(), rocket._y.back(), rocket._v_y.back(), rocket._z.back(), rocket._v_z.back());
+    double time = _time.back();
+    //std::cout << "ORBIT FRACTION: " << orbit_fraction* time_for_one_orbit << std::endl;
 
     while(_time.back() <= m_max_time)
     {
-        object_1.a_x_cm.push_back(m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-        object_1.a_y_cm.push_back(m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-        object_1.a_z_cm.push_back(m_z_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+        //std::cout << distance_from_earth_center - 6371e3 << ", ";
+        std::cout << "VAN PETLJE ZA CIRKULAR: " << angle << ", "  << distance_from_earth_center - 6371e3 << ", " << velocity << std::endl;
+        //std::cout << "brzine van: " << rocket._v_x.back() << ", " << rocket._v_y.back() << ", " << rocket._v_z.back() << std::endl;
+        while(trunc(distance_from_earth_center - 6371e3) == 208500 && velocity < m_orbital_velocity(208500, object_2._mass, 6371e3))
+        {
+            double tilt_angle = angle3(a_x_0, rocket._v_x.back(), a_y_0, rocket._v_y.back(), a_z_0, rocket._v_z.back());
+            std::cout << "UNUTAR PETLJE: " << angle << ", "  << distance_from_earth_center - 6371e3 << ", " << velocity << std::endl;
+            //std::cout << "brzine unutar: " << rocket._v_x.back() << ", " << rocket._v_y.back() << ", " << rocket._v_z.back() << std::endl;
+            //std::cout << "unutra: " << angle << std::endl;
+            move_planets(object_1, object_2, rocket, _time.back());
+            a_x_cm = (m_rocket_x_acceleration_tilted(object_1, object_2, rocket, time, tilt_angle)); 
+            a_y_cm = (m_rocket_y_acceleration_tilted(object_1, object_2, rocket, time, sgn(rocket._v_y.back())*tilt_angle));
+            a_z_cm = (m_rocket_z_acceleration_tilted(object_1, object_2, rocket, time, tilt_angle));
+            //std::cout << a_x_cm << std::endl;
+            move_rocket(rocket, a_x_cm, a_y_cm, a_z_cm);
+            //tilt_angle = angle3(a_x_0, rocket._v_x.back(), a_y_0, rocket._v_y.back(), a_z_0, rocket._v_z.back());
+            velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
+            _time.push_back(_time.back() + m_dt);
+            time += m_dt;
+            tempfile << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
+            
+        }
+        //std::cout << "van: " << angle << std::endl;
+        //std::cout << "VELOCITYASKJLFASJDSALKSA: " << velocity << std::endl;
+        move_planets(object_1, object_2, rocket, _time.back());
 
-        object_1.v_x_cm.push_back(object_1.v_x_cm.back() + object_1.a_x_cm.back()*m_dt);
-        object_1.v_y_cm.push_back(object_1.v_y_cm.back() + object_1.a_y_cm.back()*m_dt);
-        object_1.v_z_cm.push_back(object_1.v_z_cm.back() + object_1.a_z_cm.back()*m_dt);
+        a_x_cm = (m_rocket_x_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
+        a_y_cm = (m_rocket_y_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
+        a_z_cm = (m_rocket_z_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
 
-        object_1.x_cm.push_back(object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
-        object_1.y_cm.push_back(object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
-        object_1.z_cm.push_back(object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);       
-        
-        
-        object_2.a_x_cm.push_back(m_x_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-        object_2.a_y_cm.push_back(m_y_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-        object_2.a_z_cm.push_back(m_z_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-
-        object_2.v_x_cm.push_back(object_2.v_x_cm.back() + object_2.a_x_cm.back()*m_dt);
-        object_2.v_y_cm.push_back(object_2.v_y_cm.back() + object_2.a_y_cm.back()*m_dt);
-        object_2.v_z_cm.push_back(object_2.v_z_cm.back() + object_2.a_z_cm.back()*m_dt);
-
-        object_2.x_cm.push_back(object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
-        object_2.y_cm.push_back(object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
-        object_2.z_cm.push_back(object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
-
-        rocket._a_x.push_back(m_rocket_x_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
-        rocket._a_y.push_back(m_rocket_y_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
-        rocket._a_z.push_back(m_rocket_z_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
-
-        rocket._v_x.push_back(rocket._v_x.back() + rocket._a_x.back()*m_dt);
-        rocket._v_y.push_back(rocket._v_y.back() + rocket._a_y.back()*m_dt);
-        rocket._v_z.push_back(rocket._v_z.back() + rocket._a_z.back()*m_dt);
-
-        rocket._x.push_back(rocket._x.back() + rocket._v_x.back()*m_dt);
-        rocket._y.push_back(rocket._y.back() + rocket._v_y.back()*m_dt);
-        rocket._z.push_back(rocket._z.back() + rocket._v_z.back()*m_dt);
+        move_rocket(rocket, a_x_cm, a_y_cm, a_z_cm);
 
         _time.push_back(_time.back() + m_dt);
-        distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
-        file << distance_from_earth_center - 6370e3 << std::endl;
+        distance_from_earth_center = sqrt(pow(rocket._x.back() - object_2.x_cm.back(),2) + pow(rocket._y.back() - object_2.y_cm.back(),2) + pow(rocket._z.back() - object_2.z_cm.back(),2));
+        velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
+        angle = angle2(rocket._x.back(), rocket._v_x.back(), rocket._y.back(), rocket._v_y.back(), rocket._z.back(), rocket._v_z.back());
+        file << distance_from_earth_center - 6371e3 << std::endl;
         /*trenutak izbacivanja rakete iz Zemljine orbite znatno utječe na putanju*/
-        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= time_for_one_orbit + t0))
+        tempfile << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
+        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= time_for_one_orbit + t0 + orbit_fraction * time_for_one_orbit))
         {
-            //m_dt = 1;
+            m_dt = 1;
             //std::cout << distance_from_earth_center-6370e3 << std::endl;
             std::cout << "TLI burn begins: " <<_time.back() << std::endl;
             break;
@@ -720,69 +748,174 @@ void Systemtest::orbit(Planet& object_1, Planet& object_2, Rocket& rocket, doubl
 void Systemtest::translunar_injection_burn(Planet& object_1, Planet& object_2, Rocket& rocket)
 {
     double time_for_new_mass_function = 0;
-    double velocity = sqrt(pow(rocket._v_x.back(),2) + pow(rocket._v_y.back(),2) + pow(rocket._v_z.back(),2));
-    double tilt_angle = angle3(rocket._a_x.at(0), rocket._v_x.back(), rocket._a_y.at(0), rocket._v_y.back(), rocket._a_z.at(0), rocket._v_z.back());
+    double velocity = velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
+    double tilt_angle = angle3(a_x_0, rocket._v_x.back(), a_y_0, rocket._v_y.back(), a_z_0, rocket._v_z.back());
+    std::ofstream file("putanje.txt", std::ios::out | std::ios::app);
+
+
+    
+
 
     while(_time.back() < m_max_time)
     {
         /*veća brzina previše otvara putanju dok manja brzina prebrzo zatvara elipsu*/
-        if(velocity <= 10.66e3)
+        if(velocity <= 10.86e3)
         {
-            //std::cout << velocity << ", " << rocket._mass_function_for_TLI(time_for_new_mass_function) <<std::endl;
-            //std::cout << tilt_angle << std::endl;
+            // std::cout << velocity << ", " << rocket._mass_function_for_TLI(time_for_new_mass_function) <<std::endl;
+            // std::cout << tilt_angle << std::endl;
 
-            object_1.a_x_cm.push_back(m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-            object_1.a_y_cm.push_back(m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
-            object_1.a_z_cm.push_back(m_z_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+            a_x_cm_1 = (m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+            a_y_cm_1 = (m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+            a_z_cm_1 = (m_z_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
 
-            object_1.v_x_cm.push_back(object_1.v_x_cm.back() + object_1.a_x_cm.back()*m_dt);
-            object_1.v_y_cm.push_back(object_1.v_y_cm.back() + object_1.a_y_cm.back()*m_dt);
-            object_1.v_z_cm.push_back(object_1.v_z_cm.back() + object_1.a_z_cm.back()*m_dt);
+            object_1.v_x_cm.back() = (object_1.v_x_cm.back() + a_x_cm_1*m_dt);
+            object_1.v_y_cm.back() = (object_1.v_y_cm.back() + a_y_cm_1*m_dt);
+            object_1.v_z_cm.back() = (object_1.v_z_cm.back() + a_z_cm_1*m_dt);
 
-            object_1.x_cm.push_back(object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
-            object_1.y_cm.push_back(object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
-            object_1.z_cm.push_back(object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);       
+            object_1.x_cm.back() = (object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
+            object_1.y_cm.back() = (object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
+            object_1.z_cm.back() = (object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);       
             
             
-            object_2.a_x_cm.push_back(m_x_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-            object_2.a_y_cm.push_back(m_y_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
-            object_2.a_z_cm.push_back(m_z_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+            a_x_cm_2 = (m_x_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+            a_y_cm_2 = (m_y_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+            a_z_cm_2 = (m_z_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
 
-            object_2.v_x_cm.push_back(object_2.v_x_cm.back() + object_2.a_x_cm.back()*m_dt);
-            object_2.v_y_cm.push_back(object_2.v_y_cm.back() + object_2.a_y_cm.back()*m_dt);
-            object_2.v_z_cm.push_back(object_2.v_z_cm.back() + object_2.a_z_cm.back()*m_dt);
+            object_2.v_x_cm.back() = (object_2.v_x_cm.back() + a_x_cm_2*m_dt);
+            object_2.v_y_cm.back() = (object_2.v_y_cm.back() + a_y_cm_2*m_dt);
+            object_2.v_z_cm.back() = (object_2.v_z_cm.back() + a_z_cm_2*m_dt);
 
-            object_2.x_cm.push_back(object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
-            object_2.y_cm.push_back(object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
-            object_2.z_cm.push_back(object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
+            object_2.x_cm.back() = (object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
+            object_2.y_cm.back() = (object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
+            object_2.z_cm.back() = (object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
 
             //koristim novu varijablu time_of_last_thrust jer u orbiti raketa ne trosi gorivo ali vrijeme tece pa ispada da nece imati goriva za translunarnu injekciju
             //zbog nacina na koji racunam thrust faktor
             //mora bit minus za y komponentu jer je rotacija u drugom smjeru
-            rocket._a_x.push_back(m_rocket_x_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, tilt_angle)); 
-            rocket._a_y.push_back(m_rocket_y_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, -tilt_angle));
-            rocket._a_z.push_back(m_rocket_z_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, tilt_angle));
+            //std::cout << a_x_0 << ", " << a_y_0 << ", " << a_z_0 << std::endl;
+            //std::cout << rocket._v_x.back() << ", " << rocket._v_y.back() << ", " << rocket._v_z.back() << std::endl;
+            //std::cout << tilt_angle << std::endl;
 
-            rocket._v_x.push_back(rocket._v_x.back() + rocket._a_x.back()*m_dt);
-            rocket._v_y.push_back(rocket._v_y.back() + rocket._a_y.back()*m_dt);
-            rocket._v_z.push_back(rocket._v_z.back() + rocket._a_z.back()*m_dt);
+            a_x_cm = (m_rocket_x_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, tilt_angle)); 
+            a_y_cm = (m_rocket_y_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, sgn(rocket._v_y.back())*tilt_angle));
+            a_z_cm = (m_rocket_z_acceleration_TLI(object_1, object_2, rocket, time_for_new_mass_function, tilt_angle));
 
-            rocket._x.push_back(rocket._x.back() + rocket._v_x.back()*m_dt);
-            rocket._y.push_back(rocket._y.back() + rocket._v_y.back()*m_dt);
-            rocket._z.push_back(rocket._z.back() + rocket._v_z.back()*m_dt);
+            rocket._v_x.back() = (rocket._v_x.back() + a_x_cm*m_dt);
+            rocket._v_y.back() = (rocket._v_y.back() + a_y_cm*m_dt);
+            rocket._v_z.back() = (rocket._v_z.back() + a_z_cm*m_dt);
 
-            tilt_angle = angle3(rocket._a_x.at(0), rocket._v_x.back(), rocket._a_y.at(0), rocket._v_y.back(), rocket._a_z.at(0), rocket._v_z.back());
-            velocity = sqrt(pow(rocket._v_x.back(),2) + pow(rocket._v_y.back(),2) + pow(rocket._v_z.back(),2));
+            rocket._x.back() = (rocket._x.back() + rocket._v_x.back()*m_dt);
+            rocket._y.back() = (rocket._y.back() + rocket._v_y.back()*m_dt);
+            rocket._z.back() = (rocket._z.back() + rocket._v_z.back()*m_dt);
+
+            tilt_angle = angle3(a_x_0, rocket._v_x.back(), a_y_0, rocket._v_y.back(), a_z_0, rocket._v_z.back());
+            velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
             _time.push_back(_time.back() + m_dt);
             time_for_new_mass_function += m_dt;
+            //std::cout << "TU SAM" << std::endl;
+            //file << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
             //break;
         }
         else
         {
             std::cout << "TLI burn ends: " << _time.back() << std::endl;
             std::cout << "Remaining mass: " << rocket._mass_function_for_TLI(time_for_new_mass_function) << std::endl;
+            std::cout << "VELOCITY: " << velocity << std::endl;
+            file.close();
             m_dt = 10;
             break;
         }
     }
+}
+void Systemtest::lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket)
+{
+    double distance_from_moon_center = sqrt(pow(rocket._x.back() - object_1.x_cm.back(),2) + pow(rocket._y.back() - object_1.y_cm.back(),2) + pow(rocket._z.back() - object_1.z_cm.back(),2)) - 1737e3;
+    /*transformacija vektora položaja i brzine u Mjesečev referentni sustav*/
+    double rx = rocket._x.back() - object_1.x_cm.back();
+    double ry = rocket._y.back() - object_1.y_cm.back();
+    double rz = rocket._z.back() - object_1.z_cm.back();
+    double vx = rocket._v_x.back() - object_1.v_x_cm.back();
+    double vy = rocket._v_y.back() - object_1.v_y_cm.back();
+    double vz = rocket._v_z.back() - object_1.v_z_cm.back();
+    double angle = angle2(rx, vx, ry, vy, rz, vz);
+     	
+
+    std::ofstream file("putanje.txt", std::ios::out | std::ios::app);
+    std::ofstream ofc("brzine.txt", std::ios::out | std::ios::app);
+    double velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
+
+    while(_time.back() < m_max_time)
+    {
+        success = false;
+        
+        
+        a_x_cm_1 = (m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+        a_y_cm_1 = (m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+        a_z_cm_1 = (m_z_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
+
+        object_1.v_x_cm.back() = (object_1.v_x_cm.back() + a_x_cm_1*m_dt);
+        object_1.v_y_cm.back() = (object_1.v_y_cm.back() + a_y_cm_1*m_dt);
+        object_1.v_z_cm.back() = (object_1.v_z_cm.back() + a_z_cm_1*m_dt);
+
+        object_1.x_cm.back() = (object_1.x_cm.back() + object_1.v_x_cm.back()*m_dt);
+        object_1.y_cm.back() = (object_1.y_cm.back() + object_1.v_y_cm.back()*m_dt); 
+        object_1.z_cm.back() = (object_1.z_cm.back() + object_1.v_z_cm.back()*m_dt);       
+        
+        
+        a_x_cm_2 = (m_x_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+        a_y_cm_2 = (m_y_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+        a_z_cm_2 = (m_z_acceleration(object_1._mass, object_2, object_1, rocket, _time.back()));
+
+        object_2.v_x_cm.back() = (object_2.v_x_cm.back() + a_x_cm_2*m_dt);
+        object_2.v_y_cm.back() = (object_2.v_y_cm.back() + a_y_cm_2*m_dt);
+        object_2.v_z_cm.back() = (object_2.v_z_cm.back() + a_z_cm_2*m_dt);
+
+        object_2.x_cm.back() = (object_2.x_cm.back() + object_2.v_x_cm.back()*m_dt);
+        object_2.y_cm.back() = (object_2.y_cm.back() + object_2.v_y_cm.back()*m_dt);
+        object_2.z_cm.back() = (object_2.z_cm.back() + object_2.v_z_cm.back()*m_dt);
+
+        a_x_cm = (m_rocket_x_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
+        a_y_cm = (m_rocket_y_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
+        a_z_cm = (m_rocket_z_acceleration_engine_off(object_1, object_2, rocket, _time.back()));
+
+        rocket._v_x.back() = (rocket._v_x.back() + a_x_cm*m_dt);
+        rocket._v_y.back() = (rocket._v_y.back() + a_y_cm*m_dt);
+        rocket._v_z.back() = (rocket._v_z.back() + a_z_cm*m_dt);
+
+        rocket._x.back() = (rocket._x.back() + rocket._v_x.back()*m_dt);
+        rocket._y.back() = (rocket._y.back() + rocket._v_y.back()*m_dt);
+        rocket._z.back() = (rocket._z.back() + rocket._v_z.back()*m_dt);
+
+        _time.push_back(_time.back() + m_dt);
+
+        velocity = sqrt(pow(rocket._v_x.back() - object_2.v_x_cm.back(),2) + pow(rocket._v_y.back() - object_2.v_y_cm.back(),2) + pow(rocket._v_z.back() - object_2.v_z_cm.back(),2));
+        ofc << velocity << std::endl;
+        
+
+
+        distance_from_moon_center = sqrt(pow(rocket._x.back() - object_1.x_cm.back(),2) + pow(rocket._y.back() - object_1.y_cm.back(),2) + pow(rocket._z.back() - object_1.z_cm.back(),2)) - 1737e3;
+        double distance_from_earth = sqrt(pow(rocket._x.back() - object_2.x_cm.back(),2) + pow(rocket._y.back() - object_2.y_cm.back(),2) + pow(rocket._z.back() - object_2.z_cm.back(),2));
+        rx = rocket._x.back() - object_1.x_cm.back();
+        ry = rocket._y.back() - object_1.y_cm.back();
+        rz = rocket._z.back() - object_1.z_cm.back();
+        vx = rocket._v_x.back() - object_1.v_x_cm.back();
+        vy = rocket._v_y.back() - object_1.v_y_cm.back();
+        vz = rocket._v_z.back() - object_1.v_z_cm.back();
+        angle = angle2(rx, rocket._v_x.back(), ry, rocket._v_y.back(), rz, rocket._v_z.back());
+        //std::cout << distance_from_moon_center << std::endl;
+        file << rocket._x.back() << std::setw(15) << rocket._y.back() << std::setw(15) << rocket._z.back() << std::endl;
+        if(distance_from_moon_center <= 500e3)
+        {
+            m_dt = 1;
+            std::cout << rx << ", " << ry << ", " << rz << std::endl;
+            std::cout << vx << ", " << vy << ", " << vz << std::endl;
+            std::cout << angle2(rx, vx, ry, vy, rz, vz) << std::endl;
+            success = true;
+            break;
+        }
+    }
+    //std::cout << rx << ", " << ry << ", " << rz << std::endl;
+    std::cout << distance_from_moon_center << std::endl;
+    std::cout << "End time: " << _time.back() << std::endl;
+
 }

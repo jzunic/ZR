@@ -597,7 +597,7 @@ void System::lift_off(Planet& object_1, Planet& object_2, Rocket& rocket)
 
         double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
         //std::cout << distance_from_earth_center - 6371e3 << ", " << rocket._mass_function(_time.back()) << std::endl;
-        if (distance_from_earth_center - 6371e3 >= 500 || distance_from_earth_center - 6370e3 <= 0)
+        if (distance_from_earth_center - 6371e3 >= 100 || distance_from_earth_center - 6370e3 <= 0)
         {
             //std::cout << angle(rocket) << std::endl;
             std::cout << "Lift off ends: " <<_time.back() << std::endl;
@@ -778,7 +778,7 @@ void System::orbit(Planet& object_1, Planet& object_2, Rocket& rocket)
 {
 
     double distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
-    double time_for_one_orbit = m_one_orbit(6.67339e+06);
+    double time_for_one_orbit = m_one_orbit(6.53103e+06);
     double t0 = _time.back();
 
     while(_time.back() <= m_max_time)
@@ -823,7 +823,7 @@ void System::orbit(Planet& object_1, Planet& object_2, Rocket& rocket)
         _time.push_back(_time.back() + m_dt);
         distance_from_earth_center = sqrt(pow(rocket._x.back(),2) + pow(rocket._y.back(),2) + pow(rocket._z.back(),2));
 
-        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= time_for_one_orbit + t0))
+        if(distance_from_earth_center - 6370e3 <=0 || (_time.back() >= 1.3*time_for_one_orbit + t0))
         {
             m_dt = 1;
             //std::cout << distance_from_earth_center-6370e3 << std::endl;
@@ -844,8 +844,8 @@ void System::translunar_injection_burn(Planet& object_1, Planet& object_2, Rocke
         /*veća brzina previše otvara putanju dok manja brzina prebrzo zatvara elipsu*/
         if(velocity <= 10.66e3)
         {
-            //std::cout << velocity << ", " << rocket._mass_function_for_TLI(time_for_new_mass_function) <<std::endl;
-            //std::cout << tilt_angle << std::endl;
+            // std::cout << velocity << ", " << rocket._mass_function_for_TLI(time_for_new_mass_function) <<std::endl;
+            // std::cout << tilt_angle << std::endl;
 
             object_1.a_x_cm.push_back(m_x_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));
             object_1.a_y_cm.push_back(m_y_acceleration(object_2._mass, object_1, object_2, rocket, _time.back()));

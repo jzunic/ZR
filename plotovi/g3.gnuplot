@@ -6,4 +6,4 @@ set ylabel "y [m]"
 set view equal
 
 #plot "../udaljenosti.txt" u 1:2 w l 
-plot "../rocket_cm.txt" u 1:2 w l 
+plot "../yaaa.txt" u 1:2 w l 

@@ -53,15 +53,15 @@ int main()
     std::vector<std::vector<double>> earth_3D = earth.Generate_planet_3D(earth);
     std::vector<std::vector<double>> moon_3D = moon.Generate_planet_3D(moon);
 
-    double calculated_angle = 25.752;
+    double calculated_angle = 9.75586;
     std::vector<double> time;
     System system(5*24*3600, time);
     system.lift_off(moon, earth, rocket);
     system.tilting(moon, earth, rocket, calculated_angle);
     system.gravity_turn(moon, earth, rocket, calculated_angle);
     system.orbit(moon, earth, rocket);
-    //system.translunar_injection_burn(moon, earth, rocket);
-    //system.lunar_trajectory(moon, earth, rocket);
+    system.translunar_injection_burn(moon, earth, rocket);
+    system.lunar_trajectory(moon, earth, rocket);
     //system.lunar_capture(moon, earth, rocket);
     //system.lunar_orbit(moon, earth, rocket);
     // system.lunar_landing(moon, earth, rocket);
