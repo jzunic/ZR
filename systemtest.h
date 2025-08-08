@@ -58,7 +58,7 @@ class Systemtest
         void gravity_turn(Planet& object_1, Planet& object_2, Rocket& rocket);
         void orbit(Planet& object_1, Planet& object_2, Rocket& Rocket, double orbit_fraction);
         void translunar_injection_burn(Planet& object_1, Planet& object_2, Rocket& rocket);
-        void lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket);
+        void lunar_trajectory(Planet& object_1, Planet& object_2, Rocket& rocket, int altitude);
         void lunar_capture(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_orbit(Planet& object_1, Planet& object_2, Rocket& rocket);
         void lunar_landing(Planet& object_1, Planet& object_2, Rocket& rocket);
