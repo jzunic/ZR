@@ -19,6 +19,7 @@ class Rocket
             std::function<double(double)> mass_function,
             std::function<double(double)> mass_function_for_TLI,
             std::function<double(double)> mass_function_for_lunar_capture,
+            std::function<double(double)> mass_function_for_DOI,
             std::function<double(double)> mass_function_for_lunar_landing
         );
         double _fuel_mass, _rocket_mass;
@@ -26,6 +27,7 @@ class Rocket
         std::function<double(double)> _mass_function;
         std::function<double(double)> _mass_function_for_TLI;
         std::function<double(double)> _mass_function_for_lunar_capture;
+        std::function<double(double)> _mass_function_for_DOI;
         std::function<double(double)> _mass_function_for_lunar_landing;
 
 };

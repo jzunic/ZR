@@ -15,6 +15,7 @@ Rocket::Rocket(
     std::function<double(double)> mass_function,
     std::function<double(double)> mass_function_for_TLI,
     std::function<double(double)> mass_function_for_lunar_capture,
+    std::function<double(double)> mass_function_for_DOI,
     std::function<double(double)> mass_function_for_lunar_landing
 )
 {
@@ -29,6 +30,7 @@ Rocket::Rocket(
     _mass_function = mass_function;
     _mass_function_for_TLI = mass_function_for_TLI;
     _mass_function_for_lunar_capture = mass_function_for_lunar_capture;
+    _mass_function_for_DOI = mass_function_for_DOI;
     _mass_function_for_lunar_landing = mass_function_for_lunar_landing;
 }
 
